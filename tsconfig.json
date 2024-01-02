@@ -2,7 +2,8 @@
     "extends": "@tsconfig/node20/tsconfig.json",
     "compilerOptions": {
         "esModuleInterop": true,
-        "outDir": "dist"
+        "outDir": "dist",
+        "declaration": true,
     },
     "include": [
         "src/**/*",
