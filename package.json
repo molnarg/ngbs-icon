@@ -1,0 +1,35 @@
+{
+  "name": "ngbs-icon",
+  "version": "1.0.0",
+  "description": "NGBS iCON client library and command line tool",
+  "main": "dist/index.js",
+  "bin": {
+    "ngbs_icon": "dist/ngbs_icon.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "jsmodbus": "4.x",
+    "minimist": "1.x"
+  },
+  "devDependencies": {
+    "@tsconfig/node20": "^20.1.2",
+    "@types/minimist": "^1.2.5",
+    "@types/node": "^20.10.6",
+    "typescript": "^5.3.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/molnarg/ngbs-icon.git"
+  },
+  "keywords": [
+    "ngbs"
+  ],
+  "author": "Gábor Molnár",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/molnarg/ngbs-icon/issues"
+  },
+  "homepage": "https://github.com/molnarg/ngbs-icon#readme"
+}
