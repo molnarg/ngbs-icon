@@ -29,12 +29,13 @@ export class NgbsIconModbusTcpClient implements NgbsIconClient {
     }
 
     private async connect() {
-        return new Promise<void>(resolve => {
+        return new Promise<void>((resolve, reject) => {
             if (this.socket.connecting) {
                 this.socket.once("connect", resolve);
             } else if (this.socket.pending || this.socket.closed) {
                 // First connection, or reconnection if it was closed (iCON closes it every 30s)
                 this.socket.connect(this.port, this.ip, resolve);
+                this.socket.once("error", reject);
             } else {
                 resolve();
             }
