@@ -1,4 +1,4 @@
-export interface Thermostat {
+export interface NgbsIconThermostat {
     id: number;
     valve: boolean;
     eco: boolean;
@@ -14,7 +14,7 @@ export interface Thermostat {
     };
 }
 
-export interface Controller {
+export interface NgbsIconController {
     mixingValve: number;
     waterTemperature: number;
     outsideTemperature: number;
@@ -22,8 +22,8 @@ export interface Controller {
 }
 
 export interface NgbsIconClient {
-    getThermostats(): Promise<Thermostat[]>;
+    getThermostats(): Promise<NgbsIconThermostat[]>;
     setThermostatTarget(id: number, cooling: boolean, eco: boolean, target: number): Promise<void>;
-    getController(): Promise<Controller>;
+    getController(): Promise<NgbsIconController>;
     disconnect(): void;
 }
