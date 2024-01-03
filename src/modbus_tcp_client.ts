@@ -34,8 +34,11 @@ export class NgbsIconModbusTcpClient implements NgbsIconClient {
                 this.socket.once("connect", resolve);
             } else if (this.socket.pending || this.socket.closed) {
                 // First connection, or reconnection if it was closed (iCON closes it every 30s)
-                this.socket.connect(this.port, this.ip, resolve);
                 this.socket.once("error", reject);
+                this.socket.connect(this.port, this.ip, () => {
+                    this.socket.off("error", reject);
+                    resolve();
+                });
             } else {
                 resolve();
             }
