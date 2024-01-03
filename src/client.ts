@@ -1,4 +1,4 @@
-declare interface Thermostat {
+export interface Thermostat {
     id: number;
     valve: boolean;
     eco: boolean;
@@ -14,7 +14,7 @@ declare interface Thermostat {
     };
 }
 
-declare interface Controller {
+export interface Controller {
     mixingValve: number;
     waterTemperature: number;
     outsideTemperature: number;
