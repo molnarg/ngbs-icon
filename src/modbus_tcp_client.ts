@@ -43,7 +43,7 @@ export class NgbsIconModbusTcpClient implements NgbsIconClient {
     }
 
     disconnect() {
-        this.socket.resetAndDestroy();
+        this.socket.destroySoon();
     }
 
     async getThermostats() {
