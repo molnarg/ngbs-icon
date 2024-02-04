@@ -22,8 +22,8 @@ export async function getSysId(host: string): Promise<string> {
                         resolve(response['SYSID']);
                     } else if (response['ERR'] === 1) {
                         // Versions prior to 1079 (from Jan 2023) require you to provide the SYSID in
-                        // every request, including this
-                        reject(new Error('NGBS found but cannot get SYSID due to outdated software'));
+                        // every request, including this.
+                        resolve('');
                     } else {
                         reject(new Error('Uknown response format: ' + data.toString()));
                     }
@@ -34,6 +34,16 @@ export async function getSysId(host: string): Promise<string> {
             });
         });
     });
+}
+
+// Check if the given host is an NGBS controller
+export async function isNgbsHost(host: string): Promise<boolean> {
+    try {
+        await getSysId(host);
+        return true;
+    } catch(e: any) {
+        return false;
+    }
 }
 
 // Check if MAC address falls into one of the ranges reserved for iCON controllers
