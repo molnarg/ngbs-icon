@@ -1,4 +1,4 @@
-import {NgbsIconModbusTcpClient, NgbsIconClient, getSysId} from '.';
+import {connect, getSysId} from '.';
 
 let command = process.argv.slice(2);
 if (command.length < 1) {
@@ -9,7 +9,7 @@ const host = command.shift()!;
 async function run() {
     if (command[0] === 'sysid') {
         const result = await getSysId(host);
-        console.log(result);
+        console.log(result || 'Could not retrieve SYSID, due to the controller running an old software version');
         return;
     } else if (command[0] === 'scan') {
         let results;
@@ -25,7 +25,7 @@ async function run() {
         return;
     }
 
-    const c: NgbsIconClient = new NgbsIconModbusTcpClient(host);
+    const c = connect(host);
     if (command[0] === 'thermostat') {
         if (command[1] === 'get') {
             const thermostats = await c.getThermostats();

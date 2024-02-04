@@ -1,5 +1,6 @@
 export interface NgbsIconThermostat {
     id: number;
+    name?: string;
     valve: boolean;
     eco: boolean;
     cooling: boolean;
@@ -15,10 +16,11 @@ export interface NgbsIconThermostat {
 }
 
 export interface NgbsIconController {
+    name?: string;
     mixingValve: number;
     waterTemperature: number;
     outsideTemperature: number;
-    targetWaterTemperature: number;
+    targetWaterTemperature?: number;
 }
 
 export interface NgbsIconClient {

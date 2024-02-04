@@ -1,39 +1,9 @@
-import { Socket } from 'net'
+import { NgbsIconServiceClient } from '.';
 
-// Get the SYSID from the given host through the 7992 TCP service port.
-export async function getSysId(host: string): Promise<string> {
-    return new Promise((resolve, reject) => {
-        const socket = new Socket();
-        socket.setTimeout(2000);
-        socket.once('timeout', () => {
-            socket.destroy();
-            reject(new Error('Connection timeout'));
-        });
-        socket.once('error', (e) => {
-            socket.destroy();
-            reject(e);
-        });
-        socket.connect(7992, host, () => {
-            socket.write('{"RELOAD":6}');
-            socket.once('data', (data: Buffer) => {
-                try {
-                    const response = JSON.parse(data.toString());
-                    if (response['SYSID']) {
-                        resolve(response['SYSID']);
-                    } else if (response['ERR'] === 1) {
-                        // Versions prior to 1079 (from Jan 2023) require you to provide the SYSID in
-                        // every request, including this.
-                        resolve('');
-                    } else {
-                        reject(new Error('Uknown response format: ' + data.toString()));
-                    }
-                } catch (e: any) {
-                    reject(new Error('Non-JSON response from host: ' + data.toString()));
-                }
-                socket.destroySoon();
-            });
-        });
-    });
+// Get the SYSID from the given host through the TCP service port.
+export async function getSysId(host: string, port = 7992): Promise<string> {
+    const c = new NgbsIconServiceClient(host, '', port);
+    return c.getSysId();
 }
 
 // Check if the given host is an NGBS controller
