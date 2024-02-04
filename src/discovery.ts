@@ -20,9 +20,12 @@ export async function getSysId(host: string): Promise<string> {
                     const response = JSON.parse(data.toString());
                     if (response['SYSID']) {
                         resolve(response['SYSID']);
+                    } else if (response['ERR'] === 1) {
+                        // Versions prior to 1079 (from Jan 2023) require you to provide the SYSID in
+                        // every request, including this
+                        reject(new Error('NGBS found but cannot get SYSID due to outdated software'));
                     } else {
-                        // Versions prior to 1079 (from Jan 2023) require you to provide the SYSID in every request, including this
-                        reject(new Error('SYSID not found in response (please update the controller software): ' + data.toString()));
+                        reject(new Error('Uknown response format: ' + data.toString()));
                     }
                 } catch (e: any) {
                     reject(new Error('Non-JSON response from host: ' + data.toString()));
