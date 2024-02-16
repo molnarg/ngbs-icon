@@ -23,29 +23,22 @@ $ ngbs_icon 192.168.1.1-192.168.1.255 scan
 Print the status of the iCON controller (`client.getController()`):
 
 ```bash
-$ ngbs_icon modbus-tcp://192.168.1.19 controller get
+$ ngbs_icon service://123456789@192.168.1.19 controller get
 {"mixingValve":0,"waterTemperature":222,"outsideTemperature":222,"targetWaterTemperature":45}
 ```
 
  Print the status of all thermostats and a specific thermostat (`client.getThermostats()`):
 
 ```bash
-$ ngbs_icon modbus-tcp://192.168.1.19 thermostat get
+$ ngbs_icon service://123456789@192.168.1.19 thermostat get
 [{"id":0,"temperature":23.9,"humidity":44.8,"cooling":false,"eco":false,"target":23.1,"targets":{"heating":23.1,"cooling":27,"ecoHeating":17,"ecoCooling":27},"valve":false},{"id":1,"temperature":23.9,"humidity":44.9,"cooling":false,"eco":false,"target":23,"targets":{"heating":23,"cooling":26,"ecoHeating":17,"ecoCooling":29},"valve":false}]
-$ ngbs_icon modbus-tcp://192.168.1.19 thermostat get 1
+$ ngbs_icon service://123456789@192.168.1.19 thermostat get 1
 {"id":0,"temperature":23.9,"humidity":44.8,"cooling":false,"eco":false,"target":23.1,"targets":{"heating":23.1,"cooling":27,"ecoHeating":17,"ecoCooling":27},"valve":false}
 ```
 
 Set the eco/non-eco cooling/heating target temperature (`client.setThermostatTarget()`):
 
 ```bash
-ngbs_icon modbus-tcp://192.168.1.19 thermostat set 1 eco cooling 24
-ngbs_icon modbus-tcp://192.168.1.19 thermostat set 1 heating 23
-```
-
-Support for the JSON based service protocol as an alternative to MODBUS-TCP. This requires knowing the SYSID.
-
-```bash
-$ ngbs_icon service://123456789@192.168.1.19 controller get
-{"mixingValve":0,"waterTemperature":222,"outsideTemperature":222,"targetWaterTemperature":45}
+ngbs_icon service://123456789@192.168.1.19 thermostat set 1 eco cooling 24
+ngbs_icon service://123456789@192.168.1.19 thermostat set 1 heating 23
 ```
