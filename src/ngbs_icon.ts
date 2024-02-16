@@ -28,10 +28,9 @@ async function run() {
     const c = connect(host);
     if (command[0] === 'thermostat') {
         if (command[1] === 'get') {
-            const thermostats = await c.getThermostats();
+            const thermostats = (await c.getState()).thermostats;
             if (command[2] !== undefined) {
-                const id = parseInt(command[2]);
-                console.log(JSON.stringify(thermostats.find(t => t.id === id)));
+                console.log(JSON.stringify(thermostats.find(t => t.id === command[2])));
             } else {
                 console.log(JSON.stringify(thermostats));
             }
@@ -41,7 +40,7 @@ async function run() {
             if (!['cooling', 'heating'].includes(command[3 + eco])) throw new Error('Invalid target type');
             if (command[4 + eco] === undefined) throw new Error('Missing target temperature');
             await c!.setThermostatTarget(
-                parseInt(command[2]),
+                command[2],
                 command[3 + eco] == 'cooling',
                 Boolean(eco),
                 parseFloat(command[4 + eco]),
@@ -49,13 +48,12 @@ async function run() {
         }
     } else if (command[0] === 'controller') {
         if (command[1] === 'get') {
-            const controller = await c.getController();
+            const controller = (await c.getState(true)).controller;
             console.log(JSON.stringify(controller));
         }
     } else {
         throw new Error('No known command specified')
     }
-    c.disconnect();
 }
 
 
