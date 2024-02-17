@@ -36,6 +36,10 @@ async function run() {
             }
         } else if (command[1] === 'set') {
             if (command[2] === undefined) throw new Error('Missing thermostat ID');
+            if (command[3] === 'limit') {
+                await c!.setThermostatLimit(command[2], parseFloat(command[4]));
+                return;
+            }
             const eco = Number(command[3] === 'eco');
             if (!['cooling', 'heating'].includes(command[3 + eco])) throw new Error('Invalid target type');
             if (command[4 + eco] === undefined) throw new Error('Missing target temperature');

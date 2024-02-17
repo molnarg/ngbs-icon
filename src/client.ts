@@ -13,6 +13,8 @@ export interface NgbsIconThermostat {
         ecoHeating: number;
         ecoCooling: number;
     };
+    // Limits of adjusting the thermostat in degrees +/- 20C (e.g. 5 => 15-25)
+    limit: number;
 }
 
 export interface NgbsIconController {
@@ -35,4 +37,5 @@ export interface NgbsIconState {
 export interface NgbsIconClient {
     getState(config?: boolean): Promise<NgbsIconState>;
     setThermostatTarget(id: string, cooling: boolean, eco: boolean, target: number): Promise<NgbsIconState>;
+    setThermostatLimit(id: string, limit: number): Promise<NgbsIconState>;
 }

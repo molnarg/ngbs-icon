@@ -61,7 +61,7 @@ export class NgbsIconServiceClient implements NgbsIconClient {
     }
 
     async getState(config = false): Promise<NgbsIconState> {
-        return this.parseState(await this.request({"SYSID": this.sysId, "RELOAD": config ? 1 : undefined}))
+        return this.parseState(await this.request({ "SYSID": this.sysId, "RELOAD": config ? 1 : undefined }));
     }
     
     async setThermostatTarget(id: string, cooling: boolean, eco: boolean, target: number): Promise<NgbsIconState> {
@@ -72,7 +72,14 @@ export class NgbsIconServiceClient implements NgbsIconClient {
                     [cooling ? (eco ? "ECOC" : "XAC") : (eco ? "ECOH" : "XAH")]: target
                 }
             },
-        }))
+        }));
+    }
+
+    async setThermostatLimit(id: string, limit: number) {
+        return this.parseState(await this.request({
+            "SYSID": this.sysId,
+            "DP": { [id]: { "LIM": limit } },
+        }));
     }
 
     parseState(state: any): NgbsIconState {
@@ -96,6 +103,7 @@ export class NgbsIconServiceClient implements NgbsIconClient {
                     ecoHeating: th["ECOH"],
                     ecoCooling: th["ECOC"],
                 },
+                limit: th["LIM"],
             })
         }
         const cfg = state["CFG"];
