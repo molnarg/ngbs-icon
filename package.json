@@ -1,6 +1,6 @@
 {
   "name": "ngbs-icon",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "NGBS iCON client library and command line tool",
   "main": "dist/index.js",
   "bin": {

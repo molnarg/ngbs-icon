@@ -23,7 +23,11 @@ export class NgbsIconServiceClient implements NgbsIconClient {
                 socket.once("end", () => {
                     socket.destroySoon();
                     try {
-                        resolve(JSON.parse(response));
+                        const data = JSON.parse(response);
+                        if (data['ERR'] === 1) {
+                            reject(new Error('NGBS error (incorrect SYSID?)'));
+                        }
+                        resolve(data);
                     } catch(e) {
                         reject(new Error('Could not parse NGBS response: ' + response));
                     }
@@ -33,13 +37,20 @@ export class NgbsIconServiceClient implements NgbsIconClient {
     }
 
     async getSysId(): Promise<string> {
-        const response = await this.request({"RELOAD": 6});
-        if (response['SYSID']) {
-            return response['SYSID'];
-        } else if (response['ERR'] === 1) {
+        let response;
+        try {
+            response = await this.request({"RELOAD": 6});            
+        } catch(e: any) {
             // Versions prior to 1079 (from Jan 2023) require you to provide the SYSID in
             // every request, including this.
-            return '';
+            if (e.message === 'NGBS error (incorrect SYSID?)') {
+                return '';
+            } else {
+                throw e;
+            }
+        }
+        if (response['SYSID']) {
+            return response['SYSID'];
         } else {
             throw new Error('Uknown response format: ' + JSON.stringify(response));
         }
