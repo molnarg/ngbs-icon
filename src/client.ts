@@ -14,6 +14,7 @@ export interface NgbsIconThermostat {
         ecoCooling: number;
     };
     // Limits of adjusting the thermostat in degrees +/- 20C (e.g. 5 => 15-25)
+    // TODO: is it always 20C or relative to the global XAH/XAC?
     limit: number;
 }
 
