@@ -27,6 +27,7 @@ export interface NgbsIconControllerConfig {
 }
 
 export interface NgbsIconState {
+    url: string;
     controller: NgbsIconController;
     thermostats: NgbsIconThermostat[];
 }
