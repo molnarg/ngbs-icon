@@ -28,13 +28,11 @@ $ ngbs_icon service://123456789@192.168.1.19 controller get
 {"waterTemperature":222,"outsideTemperature":222,"config":{"name":"Test Controller","mixingValve":0}}
 ```
 
- Print the status of all thermostats and a specific thermostat (`client.getState().thermostats`):
+ Print the status of a specific thermostat or all without thermostat ID (`client.getState().thermostats`):
 
 ```bash
-$ ngbs_icon service://123456789@192.168.1.19 thermostat get
-[{"id":"1.1","name":"Room 1","valve":false,"eco":false,"cooling":false,"temperature":24.4,"humidity":38.2,"target":23.5,"targets":{"heating":23.5,"cooling":27,"ecoHeating":18,"ecoCooling":27},"limit":5},{"id":"1.2","name":"Room 2","valve":false,"eco":false,"cooling":false,"temperature":24.6,"humidity":38.6,"target":23,"targets":{"heating":23,"cooling":26,"ecoHeating":17,"ecoCooling":29},"limit":5}]
 $ ngbs_icon service://123456789@192.168.1.19 thermostat get 1.1
-{"id":"1.1","name":"Room 1","valve":false,"eco":false,"cooling":false,"temperature":24.4,"humidity":38.2,"target":23.5,"targets":{"heating":23.5,"cooling":27,"ecoHeating":18,"ecoCooling":27},"limit":5}
+{"id":"1.1","name":"Room 1","live":true,"valve":false,"parentalLock":false,"eco":false,"ecoFollowsMaster":true,"cooling":false,"temperature":24.4,"humidity":38.2,"dew":10.2,"dewProtection":false,"frost":false,"target":23.5,"targets":{"heating":23.5,"cooling":27,"ecoHeating":18,"ecoCooling":27},"floorHeatingOffset":1,"floorCoolingOffset":0,"limit":5}
 ```
 
 Set the eco/non-eco cooling/heating target temperature (`client.setThermostatTarget()`):

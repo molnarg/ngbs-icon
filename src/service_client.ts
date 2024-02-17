@@ -91,11 +91,17 @@ export class NgbsIconServiceClient implements NgbsIconClient {
             thermostats.push({
                 id: ngbsId,
                 name: th["NAME"],
+                live: th["LIVE"] === 1,
+                parentalLock: th["PL"] === 1,
                 valve: th["OUT"] === 1,
                 eco: th["CE"] === 1,
+                ecoFollowsMaster: th["CEF"] === 1,
                 cooling: th["HC"] === 1,
                 temperature: th["TEMP"],
                 humidity: th["RH"],
+                dewPoint: th["DEW"],
+                dewProtection: th["DWP"] === 1,
+                frost: th["FROST"] === 1,
                 target: th["CE"] ? (th["HC"] ? th["ECOC"] : th["ECOH"]) : (th["HC"] ? th["XAC"] : th["XAH"]),
                 targets: {
                     heating: th["XAH"],
@@ -103,7 +109,10 @@ export class NgbsIconServiceClient implements NgbsIconClient {
                     ecoHeating: th["ECOH"],
                     ecoCooling: th["ECOC"],
                 },
+                floorHeatingOffset: th["DXH"],
+                floorCoolingOffset: th["DXC"],
                 limit: th["LIM"],
+                // Unknown fields: IHC, DI, CEC (C/E Comfort?), WP, MV, TPR (thermostat proxy ~ closeness sensor?)
             })
         }
         const cfg = state["CFG"];
