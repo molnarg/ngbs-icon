@@ -79,6 +79,21 @@ export class NgbsIconServiceClient implements NgbsIconClient {
         }));
     }
 
+    async setThermostatLimitMidpoint(id: string, midpoint: number, heatingCoolingDiff: number, ecoDiff: number): Promise<NgbsIconState> {
+        return this.parseState(await this.request({
+            "SYSID": this.sysId,
+            "DP": { [id]: { "DXA": midpoint, "ZEB": heatingCoolingDiff, "ECO": ecoDiff } },
+        }));
+    }
+
+    async setThermostatLimitMidpoints(midpoint: number, heatingCoolingDiff: number, ecoDiff: number): Promise<NgbsIconState> {
+        let state = await this.getState();
+        for (let th of state.thermostats) {
+            state = await this.setThermostatLimitMidpoint(th.id, midpoint, heatingCoolingDiff, ecoDiff);
+        }
+        return state;
+    }
+
     async setThermostatLimit(id: string, limit: number) {
         return this.parseState(await this.request({
             "SYSID": this.sysId,
@@ -132,6 +147,12 @@ export class NgbsIconServiceClient implements NgbsIconClient {
             controller: {
                 waterTemperature: state['WTEMP'],
                 outsideTemperature: state['ETEMP'],
+                midpoints: {
+                    heating: state["XAH"],
+                    cooling: state["XAC"],
+                    ecoHeating: state["ECOH"],
+                    ecoCooling: state["ECOC"],
+                },
                 config,
             }
         }

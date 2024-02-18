@@ -58,6 +58,13 @@ async function run() {
         if (command[1] === 'get') {
             const controller = (await c.getState(true)).controller;
             console.log(JSON.stringify(controller));
+        } else if (command[1] === 'set') {
+            if (command[2] !== 'midpoints') throw new Error('Invalid command');
+            await c!.setThermostatLimitMidpoints(
+                parseFloat(command[3]),
+                parseFloat(command[4]),
+                parseFloat(command[5]),
+            );
         }
     } else {
         throw new Error('No known command specified')
