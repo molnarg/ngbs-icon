@@ -50,6 +50,7 @@ export interface NgbsIconController {
 export interface NgbsIconControllerConfig {
     name: string;
     mixingValve: number;
+    thermostatHysteresis: number;
 }
 
 export interface NgbsIconState {

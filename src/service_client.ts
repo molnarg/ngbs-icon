@@ -175,6 +175,7 @@ export class NgbsIconServiceClient implements NgbsIconClient {
         const config = cfg && {
             name: cfg['NAME'],
             mixingValve: cfg['ICON1']['STATUS']['AO'],
+            thermostatHysteresis: cfg['THH'],
         };
         return {
             url: this.url,
