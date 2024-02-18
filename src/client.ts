@@ -47,6 +47,7 @@ export interface NgbsIconState {
 
 export interface NgbsIconClient {
     getState(config?: boolean): Promise<NgbsIconState>;
-    setThermostatTarget(id: string, cooling: boolean, eco: boolean, target: number): Promise<NgbsIconState>;
+    // Set target temperature. Cooling and ECO specify the mode. If they are not set, then the current active mode.
+    setThermostatTarget(id: string, target: number, cooling?: boolean, eco?: boolean): Promise<NgbsIconState>;
     setThermostatLimit(id: string, limit: number): Promise<NgbsIconState>;
 }

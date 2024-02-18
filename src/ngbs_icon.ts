@@ -40,14 +40,18 @@ async function run() {
                 await c!.setThermostatLimit(command[2], parseFloat(command[4]));
                 return;
             }
+            if (!isNaN(parseFloat(command[3]))) {
+                await c!.setThermostatTarget(command[2], parseFloat(command[3]));
+                return;
+            }
             const eco = Number(command[3] === 'eco');
             if (!['cooling', 'heating'].includes(command[3 + eco])) throw new Error('Invalid target type');
             if (command[4 + eco] === undefined) throw new Error('Missing target temperature');
             await c!.setThermostatTarget(
                 command[2],
+                parseFloat(command[4 + eco]),
                 command[3 + eco] == 'cooling',
                 Boolean(eco),
-                parseFloat(command[4 + eco]),
             );
         }
     } else if (command[0] === 'controller') {

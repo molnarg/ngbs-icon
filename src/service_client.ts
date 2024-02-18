@@ -61,17 +61,21 @@ export class NgbsIconServiceClient implements NgbsIconClient {
     }
 
     async getState(config = false): Promise<NgbsIconState> {
-        return this.parseState(await this.request({ "SYSID": this.sysId, "RELOAD": config ? 1 : undefined }));
+        return this.parseState(await this.request({ "SYSID": this.sysId, "RELOAD": config ? 3 : undefined }));
     }
     
-    async setThermostatTarget(id: string, cooling: boolean, eco: boolean, target: number): Promise<NgbsIconState> {
+    async setThermostatTarget(id: string, target: number, cooling?: boolean, eco?: boolean): Promise<NgbsIconState> {
+        let field;
+        if ((cooling === undefined) && (eco === undefined)) {
+            field = "SP";  // Set point
+        } else if ((cooling !== undefined) && (eco !== undefined)) {
+            field = cooling ? (eco ? "ECOC" : "XAC") : (eco ? "ECOH" : "XAH");
+        } else {
+            throw new Error('Must either set both of cooling and eco, or none of them.');
+        }
         return this.parseState(await this.request({
             "SYSID": this.sysId,
-            "DP": {
-                [id]: {
-                    [cooling ? (eco ? "ECOC" : "XAC") : (eco ? "ECOH" : "XAH")]: target
-                }
-            },
+            "DP": { [id]: { [field]: target } },
         }));
     }
 
@@ -112,7 +116,9 @@ export class NgbsIconServiceClient implements NgbsIconClient {
                 floorHeatingOffset: th["DXH"],
                 floorCoolingOffset: th["DXC"],
                 limit: th["LIM"],
-                // Unknown fields: IHC, DI, CEC (C/E Comfort?), WP, MV, TPR (thermostat proxy ~ closeness sensor?)
+                // Unknown fields: IHC, CEC (C/E Comfort?), WP, MV
+                // DI: ablaknyitas erzekelo? vagy WP?
+                // TPR: time program active
             })
         }
         const cfg = state["CFG"];
