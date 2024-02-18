@@ -3,6 +3,7 @@ export interface NgbsIconThermostat {
     name: string;
     live: boolean;
     parentalLock: boolean;
+    timeProgramActive: boolean;
     valve: boolean;
     eco: boolean;
     ecoFollowsMaster: boolean;
@@ -18,8 +19,7 @@ export interface NgbsIconThermostat {
     // Turn on/off floor and ceiling heating at a different temperature point
     floorHeatingOffset: number;
     floorCoolingOffset: number;
-    // Limits of adjusting the thermostat in degrees +/- 20C (e.g. 5 => 15-25)
-    // TODO: is it always 20C or relative to the global XAH/XAC?
+    // Limits of adjusting the thermostat in celsius +/- compared to the midpoint (e.g. 20 +/- 5 => 15-25)
     limit: number;
 }
 
@@ -33,7 +33,14 @@ export interface NgbsIconModeTemperatures {
 export interface NgbsIconController {
     waterTemperature: number;
     outsideTemperature: number;
+    // Midpoint temperatures, around which the target temperatures can be set withint the thermostat specific limit
     midpoints: NgbsIconModeTemperatures;
+    firmwareVersion: string;
+    // Timestamp of the last config update
+    configVersion: string;
+    timezone: string;
+    // Uptime in hours
+    uptime: number;
     config?: NgbsIconControllerConfig;
 }
 
@@ -74,4 +81,10 @@ export interface NgbsIconClient {
     // That would be possible, the midpoints are adjusted so that midpoint +/- limit is right at this min/max.
     // E.g. if the limit is 15C, then no midpoint can be lower than 20C.
     setThermostatLimitMidpoints(midpoint: number, heatingCoolingDiff: number, ecoDiff: number): Promise<NgbsIconState>;
+
+    // Initiate a software update
+    softwareUpdate(): Promise<void>;
+
+    // Initiate a restart (reloading the controller software, not reboot)
+    softwareUpdate(): Promise<void>;
 }
