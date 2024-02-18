@@ -76,6 +76,10 @@ async function run() {
             } else {
                 throw new Error('Invalid command');
             }
+        } else if (command[1] === 'restart') {
+            await c!.restart();
+        } else if (command[1] === 'update') {
+            await c!.softwareUpdate();
         }
     } else {
         throw new Error('No known command specified')

@@ -106,5 +106,5 @@ export interface NgbsIconClient {
     softwareUpdate(): Promise<void>;
 
     // Initiate a restart (reloading the controller software, not reboot)
-    softwareUpdate(): Promise<void>;
+    restart(): Promise<void>;
 }

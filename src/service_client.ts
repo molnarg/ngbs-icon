@@ -27,7 +27,7 @@ export class NgbsIconServiceClient implements NgbsIconClient {
                 socket.once('end', () => {
                     socket.destroySoon();
                     try {
-                        const data = JSON.parse(response);
+                        const data = (response === '') ? {} : JSON.parse(response);
                         if (data['ERR'] === 1) {
                             reject(new Error('NGBS error (incorrect SYSID?)'));
                         }
@@ -127,11 +127,11 @@ export class NgbsIconServiceClient implements NgbsIconClient {
     }
 
     async softwareUpdate() {
-        await this.setGlobalField('RELOAD', 7);
+        await this.request({ 'SYSID': this.sysId, 'RELOAD': 7 });
     }
 
     async restart() {
-        await this.setGlobalField('RELOAD', 8);
+        await this.request({ 'SYSID': this.sysId, 'RELOAD': 8 });
     }
 
     parseState(state: any): NgbsIconState {

@@ -2,6 +2,10 @@
 
 NGBS iCON client library and command line tool
 
+## Client library
+
+See [client.ts](blob/main/src/client.ts) for the API documentation.
+
 ## CLI
 
 The tool is more of a proof of concept, and is used mainly to test/try the library.
@@ -66,4 +70,11 @@ $ ngbs_icon service://123456789@192.168.1.19 thermostat set 1.1 mode heating
 $ ngbs_icon service://123456789@192.168.1.19 thermostat set 1.1 mode cooling
 $ ngbs_icon service://123456789@192.168.1.19 controller set mode heating
 $ ngbs_icon service://123456789@192.168.1.19 controller set mode cooling
+```
+
+Updating and restarting the controller (`client.softwareUpdate()` and `client.restart()`):
+
+```bash
+$ ngbs_icon service://123456789@192.168.1.19 controller update
+$ ngbs_icon service://123456789@192.168.1.19 controller restart
 ```
