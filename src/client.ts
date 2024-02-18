@@ -84,6 +84,9 @@ export interface NgbsIconClient {
     // E.g. if the limit is 15C, then no midpoint can be lower than 20C.
     setThermostatLimitMidpoints(midpoint: number, heatingCoolingDiff: number, ecoDiff: number): Promise<NgbsIconState>;
 
+    // Turn on/off parental lock
+    setThermostatParentalLock(id: string, parentalLock: boolean): Promise<NgbsIconState>;
+
     // Initiate a software update
     softwareUpdate(): Promise<void>;
 

@@ -101,6 +101,13 @@ export class NgbsIconServiceClient implements NgbsIconClient {
         }));
     }
 
+    async setThermostatParentalLock(id: string, parentalLock: boolean) {
+        return this.parseState(await this.request({
+            'SYSID': this.sysId,
+            'DP': { [id]: { 'PL': parentalLock ? 1 : 0 } },
+        }));
+    }
+
     async softwareUpdate() {
         await this.request({ 'RELOAD': 7 });
     }

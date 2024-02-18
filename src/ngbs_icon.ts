@@ -40,6 +40,10 @@ async function run() {
                 await c!.setThermostatLimit(command[2], parseFloat(command[4]));
                 return;
             }
+            if (command[3] === 'lock') {
+                await c!.setThermostatParentalLock(command[2], command[4] === '1');
+                return;
+            }
             if (!isNaN(parseFloat(command[3]))) {
                 await c!.setThermostatTarget(command[2], parseFloat(command[3]));
                 return;
