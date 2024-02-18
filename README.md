@@ -58,3 +58,12 @@ $ ngbs_icon service://123456789@192.168.1.19 thermostat set 1.1 mode comfort
 $ ngbs_icon service://123456789@192.168.1.19 controller set mode eco
 $ ngbs_icon service://123456789@192.168.1.19 controller set mode comfort
 ```
+
+Set heating/cooling mode (`client.setCooling()` and `client.setThermostatCooling()`):
+
+```bash
+$ ngbs_icon service://123456789@192.168.1.19 thermostat set 1.1 mode heating
+$ ngbs_icon service://123456789@192.168.1.19 thermostat set 1.1 mode cooling
+$ ngbs_icon service://123456789@192.168.1.19 controller set mode heating
+$ ngbs_icon service://123456789@192.168.1.19 controller set mode cooling
+```

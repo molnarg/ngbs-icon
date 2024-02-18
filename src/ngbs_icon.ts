@@ -42,6 +42,8 @@ async function run() {
                 await c!.setThermostatParentalLock(command[2], command[4] === '1');
             } else if (command[3] === 'mode' && ['eco', 'comfort'].includes(command[4])) {
                 await c!.setThermostatEco(command[2], command[4] === 'eco');
+            } else if (command[3] === 'mode' && ['heating', 'cooling'].includes(command[4])) {
+                await c!.setThermostatCooling(command[2], command[4] === 'cooling');
             } else if (!isNaN(parseFloat(command[3]))) {
                 await c!.setThermostatTarget(command[2], parseFloat(command[3]));
             } else {
@@ -69,6 +71,8 @@ async function run() {
                 );
             } else if (command[2] === 'mode' && ['eco', 'comfort'].includes(command[3])) {
                 await c!.setEco(command[3] === 'eco');
+            } else if (command[2] === 'mode' && ['heating', 'cooling'].includes(command[3])) {
+                await c!.setCooling(command[3] === 'cooling');
             } else {
                 throw new Error('Invalid command');
             }

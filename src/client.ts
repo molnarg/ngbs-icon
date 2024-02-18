@@ -91,8 +91,16 @@ export interface NgbsIconClient {
     // Turn on/off master ECO mode
     setEco(eco: boolean): Promise<NgbsIconState>;
 
-    // Turn on/off ECO mode on individual thermostat (if it's the master thermostat, it has the same effect as setEco)
+    // Turn on/off ECO mode on individual thermostat (it might have no effect, or migh affect other thermostats
+    // depending on settings; e.g. ecoFollowsMaster setting of other thermostats, and if this is a master thermostat)
     setThermostatEco(id: string, eco: boolean): Promise<NgbsIconState>;
+
+    // Set the master cooling/heating mode
+    setCooling(cooling: boolean): Promise<NgbsIconState>;
+
+    // Set the heating/cooling mode on individual thermostat (it might have no effect, or migh affect other
+    // thermostats depending on settings)
+    setThermostatCooling(id: string, cooling: boolean): Promise<NgbsIconState>;
 
     // Initiate a software update
     softwareUpdate(): Promise<void>;

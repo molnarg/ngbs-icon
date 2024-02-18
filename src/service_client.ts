@@ -63,7 +63,15 @@ export class NgbsIconServiceClient implements NgbsIconClient {
     async getState(config = false): Promise<NgbsIconState> {
         return this.parseState(await this.request({ 'SYSID': this.sysId, 'RELOAD': config ? 3 : undefined }));
     }
-    
+
+    private async setThemostatField(id: string, field: string, value: any): Promise<NgbsIconState> {
+        return this.setGlobalField('DP', { [id]: { [field]: value } });
+    }
+
+    private async setGlobalField(field: string, value: any): Promise<NgbsIconState> {
+        return this.parseState(await this.request({ 'SYSID': this.sysId, [field]: value }));
+    }
+
     async setThermostatTarget(id: string, target: number, cooling?: boolean, eco?: boolean): Promise<NgbsIconState> {
         let field;
         if ((cooling === undefined) && (eco === undefined)) {
@@ -95,39 +103,35 @@ export class NgbsIconServiceClient implements NgbsIconClient {
     }
 
     async setThermostatLimit(id: string, limit: number) {
-        return this.parseState(await this.request({
-            'SYSID': this.sysId,
-            'DP': { [id]: { 'LIM': limit } },
-        }));
+        return this.setThemostatField(id, 'LIM', limit);
     }
 
     async setThermostatParentalLock(id: string, parentalLock: boolean) {
-        return this.parseState(await this.request({
-            'SYSID': this.sysId,
-            'DP': { [id]: { 'PL': parentalLock ? 1 : 0 } },
-        }));
+        return this.setThemostatField(id, 'PL', parentalLock ? 1 : 0);
     }
 
     async setEco(eco: boolean) {
-        return this.parseState(await this.request({
-            'SYSID': this.sysId,
-            'CE': eco ? 1 : 0,
-        }));
+        return this.setGlobalField('CE', eco ? 1 : 0);
     }
 
-    async setThermostatEco(id:string, eco: boolean) {
-        return this.parseState(await this.request({
-            'SYSID': this.sysId,
-            'DP': { [id]: { 'CE': eco ? 1 : 0 } },
-        }));
+    async setThermostatEco(id: string, eco: boolean) {
+        return this.setThemostatField(id, 'CE', eco ? 1 : 0);
+    }
+
+    async setCooling(cooling: boolean) {
+        return this.setGlobalField('HC', cooling ? 1 : 0);
+    }
+
+    async setThermostatCooling(id: string, cooling: boolean) {
+        return this.setThemostatField(id, 'HC', cooling ? 1 : 0);
     }
 
     async softwareUpdate() {
-        await this.request({ 'RELOAD': 7 });
+        await this.setGlobalField('RELOAD', 7);
     }
 
     async restart() {
-        await this.request({ 'RELOAD': 8 });
+        await this.setGlobalField('RELOAD', 8);
     }
 
     parseState(state: any): NgbsIconState {
