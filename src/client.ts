@@ -21,6 +21,8 @@ export interface NgbsIconThermostat {
     floorCoolingOffset: number;
     // Limits of adjusting the thermostat in celsius +/- compared to the midpoint (e.g. 20 +/- 5 => 15-25)
     limit: number;
+    // Likely midpoint - only reliable if all thermostats have the same midpoint (see setThermostatLimitMidpoints())
+    midpoint: number;
 }
 
 export interface NgbsIconModeTemperatures {

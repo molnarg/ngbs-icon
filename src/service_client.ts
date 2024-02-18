@@ -140,6 +140,7 @@ export class NgbsIconServiceClient implements NgbsIconClient {
                 floorHeatingOffset: th['DXH'],
                 floorCoolingOffset: th['DXC'],
                 limit: th['LIM'],
+                midpoint: th['CE'] ? (th['HC'] ? state['ECOC'] : state['ECOH']) : (th['HC'] ? state['XAC'] : state['XAH']),
                 // Unknown fields: IHC, CEC (C/E Comfort?), MV
                 // WP, DI: Window sensor maybe
                 // TPR: time program active
