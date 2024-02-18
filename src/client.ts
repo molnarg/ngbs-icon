@@ -6,6 +6,7 @@ export interface NgbsIconThermostat {
     timeProgramActive: boolean;
     valve: boolean;
     eco: boolean;
+    // Whether the thermostat follows the master ECO setting
     ecoFollowsMaster: boolean;
     cooling: boolean;
     temperature: number;
@@ -86,6 +87,12 @@ export interface NgbsIconClient {
 
     // Turn on/off parental lock
     setThermostatParentalLock(id: string, parentalLock: boolean): Promise<NgbsIconState>;
+
+    // Turn on/off master ECO mode
+    setEco(eco: boolean): Promise<NgbsIconState>;
+
+    // Turn on/off ECO mode on individual thermostat (if it's the master thermostat, it has the same effect as setEco)
+    setThermostatEco(id: string, eco: boolean): Promise<NgbsIconState>;
 
     // Initiate a software update
     softwareUpdate(): Promise<void>;

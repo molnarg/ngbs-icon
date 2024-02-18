@@ -108,6 +108,20 @@ export class NgbsIconServiceClient implements NgbsIconClient {
         }));
     }
 
+    async setEco(eco: boolean) {
+        return this.parseState(await this.request({
+            'SYSID': this.sysId,
+            'CE': eco ? 1 : 0,
+        }));
+    }
+
+    async setThermostatEco(id:string, eco: boolean) {
+        return this.parseState(await this.request({
+            'SYSID': this.sysId,
+            'DP': { [id]: { 'CE': eco ? 1 : 0 } },
+        }));
+    }
+
     async softwareUpdate() {
         await this.request({ 'RELOAD': 7 });
     }

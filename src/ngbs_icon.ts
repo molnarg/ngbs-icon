@@ -38,37 +38,40 @@ async function run() {
             if (command[2] === undefined) throw new Error('Missing thermostat ID');
             if (command[3] === 'limit') {
                 await c!.setThermostatLimit(command[2], parseFloat(command[4]));
-                return;
-            }
-            if (command[3] === 'lock') {
+            } else if (command[3] === 'lock') {
                 await c!.setThermostatParentalLock(command[2], command[4] === '1');
-                return;
-            }
-            if (!isNaN(parseFloat(command[3]))) {
+            } else if (command[3] === 'mode' && ['eco', 'comfort'].includes(command[4])) {
+                await c!.setThermostatEco(command[2], command[4] === 'eco');
+            } else if (!isNaN(parseFloat(command[3]))) {
                 await c!.setThermostatTarget(command[2], parseFloat(command[3]));
-                return;
+            } else {
+                const eco = Number(command[3] === 'eco');
+                if (!['cooling', 'heating'].includes(command[3 + eco])) throw new Error('Invalid target type');
+                if (command[4 + eco] === undefined) throw new Error('Missing target temperature');
+                await c!.setThermostatTarget(
+                    command[2],
+                    parseFloat(command[4 + eco]),
+                    command[3 + eco] == 'cooling',
+                    Boolean(eco),
+                );
             }
-            const eco = Number(command[3] === 'eco');
-            if (!['cooling', 'heating'].includes(command[3 + eco])) throw new Error('Invalid target type');
-            if (command[4 + eco] === undefined) throw new Error('Missing target temperature');
-            await c!.setThermostatTarget(
-                command[2],
-                parseFloat(command[4 + eco]),
-                command[3 + eco] == 'cooling',
-                Boolean(eco),
-            );
         }
     } else if (command[0] === 'controller') {
         if (command[1] === 'get') {
             const controller = (await c.getState(true)).controller;
             console.log(JSON.stringify(controller));
         } else if (command[1] === 'set') {
-            if (command[2] !== 'midpoints') throw new Error('Invalid command');
-            await c!.setThermostatLimitMidpoints(
-                parseFloat(command[3]),
-                parseFloat(command[4]),
-                parseFloat(command[5]),
-            );
+            if (command[2] === 'midpoints') {
+                await c!.setThermostatLimitMidpoints(
+                    parseFloat(command[3]),
+                    parseFloat(command[4]),
+                    parseFloat(command[5]),
+                );
+            } else if (command[2] === 'mode' && ['eco', 'comfort'].includes(command[3])) {
+                await c!.setEco(command[3] === 'eco');
+            } else {
+                throw new Error('Invalid command');
+            }
         }
     } else {
         throw new Error('No known command specified')

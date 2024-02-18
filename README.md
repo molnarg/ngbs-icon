@@ -38,14 +38,23 @@ $ ngbs_icon service://123456789@192.168.1.19 thermostat get 1.1
 Set the eco/non-eco cooling/heating target temperature (`client.setThermostatTarget()`):
 
 ```bash
-ngbs_icon service://123456789@192.168.1.19 thermostat set 1.1 eco cooling 24 # ECO heating
-ngbs_icon service://123456789@192.168.1.19 thermostat set 1.1 heating 23 # Comfort heating
-ngbs_icon service://123456789@192.168.1.19 thermostat set 1.1 22 # Current mode
+$ ngbs_icon service://123456789@192.168.1.19 thermostat set 1.1 eco cooling 24 # ECO heating
+$ ngbs_icon service://123456789@192.168.1.19 thermostat set 1.1 heating 23 # Comfort heating
+$ ngbs_icon service://123456789@192.168.1.19 thermostat set 1.1 22 # Current mode
 ```
 
 Set parental lock (`client.setThermostatParentalLock()`):
 
 ```bash
-ngbs_icon service://123456789@192.168.1.19 thermostat set 1.1 lock 1
-ngbs_icon service://123456789@192.168.1.19 thermostat set 1.1 lock 0
+$ ngbs_icon service://123456789@192.168.1.19 thermostat set 1.1 lock 1
+$ ngbs_icon service://123456789@192.168.1.19 thermostat set 1.1 lock 0
+```
+
+Set ECO mode (`client.setEco()` and `client.setThermostatEco()`):
+
+```bash
+$ ngbs_icon service://123456789@192.168.1.19 thermostat set 1.1 mode eco
+$ ngbs_icon service://123456789@192.168.1.19 thermostat set 1.1 mode comfort
+$ ngbs_icon service://123456789@192.168.1.19 controller set mode eco
+$ ngbs_icon service://123456789@192.168.1.19 controller set mode comfort
 ```
