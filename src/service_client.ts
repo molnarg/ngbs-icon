@@ -1,5 +1,6 @@
 import {NgbsIconClient, NgbsIconState} from './client'
 import {Socket} from 'net'
+import { setTimeout } from "timers/promises";
 
 export class NgbsIconServiceClient implements NgbsIconClient {
     url: string;
@@ -64,12 +65,12 @@ export class NgbsIconServiceClient implements NgbsIconClient {
         return this.parseState(await this.request({ 'SYSID': this.sysId, 'RELOAD': config ? 3 : undefined }));
     }
 
-    private async setThemostatField(id: string, field: string, value: any): Promise<NgbsIconState> {
+    private async setThemostatField(id: string, field: string, value: any): Promise<any> {
         return this.setGlobalField('DP', { [id]: { [field]: value } });
     }
 
-    private async setGlobalField(field: string, value: any): Promise<NgbsIconState> {
-        return this.parseState(await this.request({ 'SYSID': this.sysId, [field]: value }));
+    private async setGlobalField(field: string, value: any): Promise<any> {
+        return this.request({ 'SYSID': this.sysId, [field]: value });
     }
 
     async setThermostatTarget(id: string, target: number, cooling?: boolean, eco?: boolean): Promise<NgbsIconState> {
@@ -81,10 +82,15 @@ export class NgbsIconServiceClient implements NgbsIconClient {
         } else {
             throw new Error('Must either set both of cooling and eco, or none of them.');
         }
-        return this.parseState(await this.request({
-            'SYSID': this.sysId,
-            'DP': { [id]: { [field]: target } },
-        }));
+        let raw = await this.setThemostatField(id, field, target);
+        // Wait for state to stabilize to avoid flickering. It takes at least 200ms, then we check periodically for 2s.
+        for (let i = 0; i < 10; i++) {
+            await setTimeout(200);
+            raw = await this.request({ 'SYSID': this.sysId });
+            const th = raw['DP'][id];
+            if (th[field === 'SP' ? getTargetField(th) : field] === target) break;
+        }
+        return this.parseState(raw);
     }
 
     async setThermostatLimitMidpoint(id: string, midpoint: number, heatingCoolingDiff: number, ecoDiff: number): Promise<NgbsIconState> {
@@ -103,27 +109,28 @@ export class NgbsIconServiceClient implements NgbsIconClient {
     }
 
     async setThermostatLimit(id: string, limit: number) {
-        return this.setThemostatField(id, 'LIM', limit);
+        return this.parseState(await this.setThemostatField(id, 'LIM', limit));
     }
 
     async setThermostatParentalLock(id: string, parentalLock: boolean) {
-        return this.setThemostatField(id, 'PL', parentalLock ? 1 : 0);
+        return this.parseState(await this.setThemostatField(id, 'PL', parentalLock ? 1 : 0));
     }
 
     async setEco(eco: boolean) {
-        return this.setGlobalField('CE', eco ? 1 : 0);
+        return this.parseState(await this.setGlobalField('CE', eco ? 1 : 0));
     }
 
     async setThermostatEco(id: string, eco: boolean) {
-        return this.setThemostatField(id, 'CE', eco ? 1 : 0);
+        return this.parseState(await this.setThemostatField(id, 'CE', eco ? 1 : 0));
     }
 
     async setCooling(cooling: boolean) {
-        return this.setGlobalField('HC', cooling ? 1 : 0);
+        return this.parseState(await this.setGlobalField('HC', cooling ? 1 : 0));
     }
 
     async setThermostatCooling(id: string, cooling: boolean) {
-        return this.setThemostatField(id, 'HC', cooling ? 1 : 0);
+        // TODO: wait for it to take effect
+        return this.parseState(await this.setThemostatField(id, 'HC', cooling ? 1 : 0));
     }
 
     async softwareUpdate() {
@@ -155,7 +162,7 @@ export class NgbsIconServiceClient implements NgbsIconClient {
                 dewPoint: th['DEW'],
                 dewProtection: th['DWP'] === 1,
                 frost: th['FROST'] === 1,
-                target: th['CE'] ? (th['HC'] ? th['ECOC'] : th['ECOH']) : (th['HC'] ? th['XAC'] : th['XAH']),
+                target: th[getTargetField(th)],
                 targets: {
                     heating: th['XAH'],
                     cooling: th['XAC'],
@@ -199,4 +206,8 @@ export class NgbsIconServiceClient implements NgbsIconClient {
             }
         }
     }
+}
+
+function getTargetField(th: any) {
+    return th['CE'] ? (th['HC'] ? 'ECOC' : 'ECOH') : (th['HC'] ? 'XAC' : 'XAH')
 }
