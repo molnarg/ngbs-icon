@@ -34,6 +34,8 @@ export interface NgbsIconModeTemperatures {
 }
 
 export interface NgbsIconController {
+    eco: boolean;
+    cooling: boolean;
     waterTemperature: number;
     outsideTemperature: number;
     // Midpoint temperatures, around which the target temperatures can be set withint the thermostat specific limit

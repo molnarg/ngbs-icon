@@ -29,7 +29,7 @@ Print the status of the iCON controller (`client.getState(config=true).controlle
 
 ```bash
 $ ngbs_icon service://123456789@192.168.1.19 controller get
-{"waterTemperature":222,"outsideTemperature":222,"config":{"name":"Test Controller","mixingValve":0}}
+{"eco":false,"cooling":false,"waterTemperature":222,"outsideTemperature":222,"midpoints":{"heating":23,"cooling":23,"ecoHeating":20,"ecoCooling":26},"firmwareVersion":1079,"configVersion":"20230110173134","timezone":"UTC","uptime":21,"config":{"name":"Test Controller","mixingValve":0,"thermostatHysteresis":0.5}}
 ```
 
  Print the status of a specific thermostat or all without thermostat ID (`client.getState().thermostats`):
