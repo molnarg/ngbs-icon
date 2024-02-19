@@ -65,9 +65,8 @@ export interface NgbsIconState {
 export interface NgbsIconClient {
     getState(config?: boolean): Promise<NgbsIconState>;
 
-    // Set target temperature. It waits for state to stabilize (the target to be applied) before returning it.
-    // Cooling and ECO specify the mode. If they are not set, then the current active mode is used, and by the time
-    // the state stabilized, valves have been turned on/off as well (which is reflected in the returned state).
+    // Set target temperature. Cooling and ECO specify the mode. It waits for state to stabilize (the target to be
+    // applied and valves to be actuated) before returning it.
     setThermostatTarget(id: string, target: number, cooling?: boolean, eco?: boolean): Promise<NgbsIconState>;
 
     // How much Celsius above/below the midpoint can the target temperature be set.
@@ -94,21 +93,21 @@ export interface NgbsIconClient {
     // Turn on/off parental lock.
     setThermostatParentalLock(id: string, parentalLock: boolean): Promise<NgbsIconState>;
 
-    // Turn on/off master ECO mode.
+    // Turn on/off master ECO mode. It waits for valves to be actuated before returning the state.
     setEco(eco: boolean): Promise<NgbsIconState>;
 
     // Turn on/off ECO mode on individual thermostat (it might have no effect, or migh affect other thermostats
     // depending on settings; e.g. ecoFollowsMaster setting of other thermostats, and if this is a master thermostat).
+    // It waits for valves to be actuated before returning the state.
     setThermostatEco(id: string, eco: boolean): Promise<NgbsIconState>;
 
-    // Set the master cooling/heating mode. Individual thermostats switch over asynchornously after the state is
-    // returned. Actuating the valves (if needed) comes after that. The whole process takes ~7s.
+    // Set the master cooling/heating mode. It waits for state to stabilize (the targets to be applied and valves to
+    // be actuated) before returning it. The whole process takes ~7s.
     setCooling(cooling: boolean): Promise<NgbsIconState>;
 
-    // Set the heating/cooling mode on individual thermostat. It might be reversed soon if not allowed, or migh affect
+    // Set the heating/cooling mode on individual thermostat. It might be rejected if not allowed, or migh affect
     // other thermostats depending on settings (e.g. if this is the master thermostat, then it acts like setCooling()).
-    // It switches over the cooling flag and target temperature before returning the state, but actuating valves
-    // happens asynchornously.
+    // It waits for state to stabilize (the targets to be applied and valves to be actuated) before returning it.
     setThermostatCooling(id: string, cooling: boolean): Promise<NgbsIconState>;
 
     // Initiate a software update.

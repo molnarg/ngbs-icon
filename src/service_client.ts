@@ -65,6 +65,17 @@ export class NgbsIconServiceClient implements NgbsIconClient {
         return this.parseState(await this.request({ 'SYSID': this.sysId, 'RELOAD': config ? 3 : undefined }));
     }
 
+    // Wait for state to stabilize to avoid flickering. Exact timing and condition depends on the caller context.
+    private async waitForState(n: number, timeout: number, condition: (raw: any) => boolean) {
+        for (let i = 0; i < n; i++) {
+            await setTimeout(timeout);
+            // Include config, since checks might need e.g. hysteresis config value
+            const raw = await this.request({ 'SYSID': this.sysId, 'RELOAD': 3 });
+            if (condition(raw)) return raw;
+        }
+        throw new Error('Could not change state');
+    }
+
     private async setThemostatField(id: string, field: string, value: any): Promise<any> {
         return this.setGlobalField('DP', { [id]: { [field]: value } });
     }
@@ -74,7 +85,7 @@ export class NgbsIconServiceClient implements NgbsIconClient {
     }
 
     async setThermostatTarget(id: string, target: number, cooling?: boolean, eco?: boolean): Promise<NgbsIconState> {
-        let field;
+        let field: string;
         if ((cooling === undefined) && (eco === undefined)) {
             field = 'SP';  // Set point
         } else if ((cooling !== undefined) && (eco !== undefined)) {
@@ -82,14 +93,11 @@ export class NgbsIconServiceClient implements NgbsIconClient {
         } else {
             throw new Error('Must either set both of cooling and eco, or none of them.');
         }
-        let raw = await this.setThemostatField(id, field, target);
-        // Wait for state to stabilize to avoid flickering. It takes at least 200ms, then we check periodically for 2s.
-        for (let i = 0; i < 10; i++) {
-            await setTimeout(200);
-            raw = await this.request({ 'SYSID': this.sysId });
-            const th = raw['DP'][id];
-            if (th[field === 'SP' ? getTargetField(th) : field] === target) break;
-        }
+        await this.setThemostatField(id, field, target);
+        const raw = await this.waitForState(10, 200, raw => {
+            const th = raw.DP[id];
+            return (th[field === 'SP' ? getTargetField(th) : field] === target) && valvesSettled(raw);
+        });
         return this.parseState(raw);
     }
 
@@ -117,20 +125,30 @@ export class NgbsIconServiceClient implements NgbsIconClient {
     }
 
     async setEco(eco: boolean) {
-        return this.parseState(await this.setGlobalField('CE', eco ? 1 : 0));
+        await this.setGlobalField('CE', Number(eco));
+        return this.parseState(await this.waitForState(20, 500, raw => raw.CE === Number(eco) && valvesSettled(raw)));
     }
 
     async setThermostatEco(id: string, eco: boolean) {
-        return this.parseState(await this.setThemostatField(id, 'CE', eco ? 1 : 0));
+        await this.setThemostatField(id, 'CE', Number(eco));
+        return this.parseState(await this.waitForState(20, 500, raw =>
+            raw.DP[id].CE === Number(eco) && valvesSettled(raw)
+        ));
     }
 
     async setCooling(cooling: boolean) {
-        return this.parseState(await this.setGlobalField('HC', cooling ? 1 : 0));
+        await this.setGlobalField('HC', Number(cooling))
+        // Split waiting into two phases, so that the first part can fail early without waiting for the second.
+        await this.waitForState(2, 1000, raw => raw.HC === Number(cooling));
+        const raw = await this.waitForState(20, 500, valvesSettled);
+        return this.parseState(raw);
     }
 
     async setThermostatCooling(id: string, cooling: boolean) {
-        // TODO: wait for it to take effect
-        return this.parseState(await this.setThemostatField(id, 'HC', cooling ? 1 : 0));
+        await this.setThemostatField(id, 'HC', Number(cooling));
+        await this.waitForState(2, 1000, raw => raw.DP[id].HC === Number(cooling));
+        const raw = await this.waitForState(20, 500, valvesSettled);
+        return this.parseState(raw);
     }
 
     async softwareUpdate() {
@@ -206,6 +224,25 @@ export class NgbsIconServiceClient implements NgbsIconClient {
             }
         }
     }
+}
+
+function valvesSettled(state: any) {
+    const hysteresis = state.CFG.THH;
+    for (let id of Object.keys(state.DP)) {
+        const th = state.DP[id];
+        if (!th.ON || !th.LIVE) continue;
+        const target = th[getTargetField(th)];
+        const t = th.TEMP;
+        const cooling = (th.HC === 1);
+        // Due to hysteresis, there are cases when it's not clear whether the valve should be open.
+        // Treating those cases as OK, and only assuming a pending status if it's certain.
+        if (cooling) {
+            if (th.OUT ? (t < target - hysteresis) : (t > target)) return false;
+        } else {
+            if (th.OUT ? (t > target + hysteresis) : (t < target)) return false;
+        }
+    }
+    return true;
 }
 
 function getTargetField(th: any) {
