@@ -1,4 +1,4 @@
-import {connect, getSysId} from '.';
+import { NgbsIconState, connect, getSysId } from '.';
 
 let command = process.argv.slice(2);
 if (command.length < 1) {
@@ -26,61 +26,67 @@ async function run() {
     }
 
     const c = connect(host);
-    if (command[0] === 'thermostat') {
-        if (command[1] === 'get') {
-            const thermostats = (await c.getState()).thermostats;
-            if (command[2] !== undefined) {
-                console.log(JSON.stringify(thermostats.find(t => t.id === command[2])));
-            } else {
-                console.log(JSON.stringify(thermostats));
-            }
-        } else if (command[1] === 'set') {
-            if (command[2] === undefined) throw new Error('Missing thermostat ID');
+    const device = command[0];
+    const operation = command[1];
+    let state: NgbsIconState|undefined;
+    if (device === 'thermostat') {
+        const id = command[2];
+        if (operation === 'get') {
+            state = await c.getState();
+        } else if (operation === 'set') {
+            if (id === undefined) throw new Error('Missing thermostat ID');
             if (command[3] === 'limit') {
-                await c!.setThermostatLimit(command[2], parseFloat(command[4]));
+                state = await c!.setThermostatLimit(id, parseFloat(command[4]));
             } else if (command[3] === 'lock') {
-                await c!.setThermostatParentalLock(command[2], command[4] === '1');
+                state = await c!.setThermostatParentalLock(id, command[4] === '1');
             } else if (command[3] === 'mode' && ['eco', 'comfort'].includes(command[4])) {
-                await c!.setThermostatEco(command[2], command[4] === 'eco');
+                state = await c!.setThermostatEco(id, command[4] === 'eco');
             } else if (command[3] === 'mode' && ['heating', 'cooling'].includes(command[4])) {
-                await c!.setThermostatCooling(command[2], command[4] === 'cooling');
+                state = await c!.setThermostatCooling(id, command[4] === 'cooling');
             } else if (!isNaN(parseFloat(command[3]))) {
-                await c!.setThermostatTarget(command[2], parseFloat(command[3]));
+                state = await c!.setThermostatTarget(id, parseFloat(command[3]));
             } else {
                 const eco = Number(command[3] === 'eco');
                 if (!['cooling', 'heating'].includes(command[3 + eco])) throw new Error('Invalid target type');
                 if (command[4 + eco] === undefined) throw new Error('Missing target temperature');
-                await c!.setThermostatTarget(
-                    command[2],
+                state = await c!.setThermostatTarget(
+                    id,
                     parseFloat(command[4 + eco]),
                     command[3 + eco] == 'cooling',
                     Boolean(eco),
                 );
             }
+        } else {
+            throw new Error('Unknown operation:' + operation);
         }
-    } else if (command[0] === 'controller') {
-        if (command[1] === 'get') {
-            const controller = (await c.getState(true)).controller;
-            console.log(JSON.stringify(controller));
-        } else if (command[1] === 'set') {
+        if (id !== undefined) {
+            console.log(JSON.stringify(state!.thermostats.find(t => t.id === id)));
+        } else {
+            console.log(JSON.stringify(state!.thermostats));
+        }
+    } else if (device === 'controller') {
+        if (operation === 'get') {
+            state = await c.getState(true);
+        } else if (operation === 'set') {
             if (command[2] === 'midpoints') {
-                await c!.setThermostatLimitMidpoints(
+                state = await c!.setThermostatLimitMidpoints(
                     parseFloat(command[3]),
                     parseFloat(command[4]),
                     parseFloat(command[5]),
                 );
             } else if (command[2] === 'mode' && ['eco', 'comfort'].includes(command[3])) {
-                await c!.setEco(command[3] === 'eco');
+                state = await c!.setEco(command[3] === 'eco');
             } else if (command[2] === 'mode' && ['heating', 'cooling'].includes(command[3])) {
-                await c!.setCooling(command[3] === 'cooling');
+                state = await c!.setCooling(command[3] === 'cooling');
             } else {
                 throw new Error('Invalid command');
             }
-        } else if (command[1] === 'restart') {
+        } else if (operation === 'restart') {
             await c!.restart();
-        } else if (command[1] === 'update') {
+        } else if (operation === 'update') {
             await c!.softwareUpdate();
         }
+        if (state !== undefined) console.log(JSON.stringify(state.controller));
     } else {
         throw new Error('No known command specified')
     }
