@@ -21,7 +21,7 @@ async function run() {
         } else {
             throw new Error('Invalid host range (use host1,host2,host3 or ip1-ip2)')
         }
-        console.log(JSON.stringify(results));
+        console.log(results);
         return;
     }
 
@@ -60,9 +60,9 @@ async function run() {
             throw new Error('Unknown operation:' + operation);
         }
         if (id !== undefined) {
-            console.log(JSON.stringify(state!.thermostats.find(t => t.id === id)));
+            console.log(state!.thermostats.find(t => t.id === id));
         } else {
-            console.log(JSON.stringify(state!.thermostats));
+            console.log(state!.thermostats);
         }
     } else if (device === 'controller') {
         if (operation === 'get') {
@@ -86,7 +86,7 @@ async function run() {
         } else if (operation === 'update') {
             await c!.softwareUpdate();
         }
-        if (state !== undefined) console.log(JSON.stringify(state.controller));
+        if (state !== undefined) console.log(state.controller);
     } else {
         throw new Error('No known command specified')
     }
