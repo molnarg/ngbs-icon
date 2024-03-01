@@ -4,11 +4,13 @@ NGBS iCON client library and command line tool
 
 ## Client library
 
-See [client.ts](blob/main/src/client.ts) for the API documentation.
+See [client.ts](src/client.ts) for the API documentation.
+
+The current implementation uses the JSON/TCP based service protocol. A previous version used the Modbus-TCP protocol, but the JSON service protocol is more comprehensive and easier to reverse engineer. The downside compared to Modbus-TCP is that for most requests, the SYSID is needed. The SYSID is the serial number printed on the controller, and in up-to-date controllers, it can be rerieved over then network too (see below).
 
 ## CLI
 
-The tool is more of a proof of concept, and is used mainly to test/try the library.
+The tool is more of a proof of concept, and is used mainly to test and try the capabilities of the library.
 
 Get the SYSID of a controller (`getSysId()`):
 
