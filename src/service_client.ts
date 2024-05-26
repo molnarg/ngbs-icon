@@ -216,10 +216,10 @@ export class NgbsIconServiceClient implements NgbsIconClient {
                     ecoHeating: state['ECOH'],
                     ecoCooling: state['ECOC'],
                 },
-                firmwareVersion: state['INFO']['FIRMWARE'],
+                firmwareVersion: state['INFO'] && state['INFO']['FIRMWARE'],
                 configVersion: state['VER'],
                 timezone: state['TZ'],
-                uptime: state['INFO']['UPTIME'],
+                uptime: state['INFO'] && state['INFO']['UPTIME'],
                 config,
             }
         }
