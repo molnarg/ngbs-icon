@@ -87,6 +87,15 @@ $ ngbs_icon service://123456789@192.168.1.19 controller set mode cooling
 {...}
 ```
 
+Set thermostat midpoints and limits (`client.setThermostatLimitMidpoints()`):
+
+```bash
+$ ngbs_icon service://123456789@192.168.1.19 controller set midpoints 24 3 3
+{...}
+$ ngbs_icon service://123456789@192.168.1.19 thermostat set 1.1 limit 5
+{"id":"1.1", ...}
+```
+
 Updating and restarting the controller (`client.softwareUpdate()` and `client.restart()`):
 
 ```bash
