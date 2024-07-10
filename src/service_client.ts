@@ -208,8 +208,8 @@ export class NgbsIconServiceClient implements NgbsIconClient {
             controller: {
                 eco: state['CE'] === 1,
                 cooling: state['HC'] === 1,
-                waterTemperature: state['WTEMP'] / 10,
-                outsideTemperature: state['ETEMP'] / 10,
+                waterTemperature: state['WTEMP'],
+                outsideTemperature: state['ETEMP'],
                 midpoints: {
                     heating: state['XAH'],
                     cooling: state['XAC'],
