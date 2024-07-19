@@ -66,12 +66,21 @@ export class NgbsIconServiceClient implements NgbsIconClient {
     }
 
     // Wait for state to stabilize to avoid flickering. Exact timing and condition depends on the caller context.
-    private async waitForState(n: number, timeout: number, condition: (raw: any) => boolean) {
+    // Required condition must be met. If optional condition is met as well, return immediately - otherwise keep
+    // retrying until the optional condition is met as well, or we reach the retry limit.
+    private async waitForState(
+        n: number,
+        timeout: number,
+        requiredCondition?: (raw: any) => boolean,
+        optionalCondition?: (raw: any) => boolean
+    ) {
         for (let i = 0; i < n; i++) {
             await setTimeout(timeout);
             // Include config, since checks might need e.g. hysteresis config value
             const raw = await this.request({ 'SYSID': this.sysId, 'RELOAD': 3 });
-            if (condition(raw)) return raw;
+            if (!requiredCondition || requiredCondition(raw)) {
+                if (i == n - 1 || (optionalCondition && optionalCondition(raw))) return raw;
+            }
         }
         throw new Error('Could not change state');
     }
@@ -96,8 +105,8 @@ export class NgbsIconServiceClient implements NgbsIconClient {
         await this.setThemostatField(id, field, target);
         const raw = await this.waitForState(10, 200, raw => {
             const th = raw.DP[id];
-            return (th[field === 'SP' ? getTargetField(th) : field] === target) && valvesSettled(raw);
-        });
+            return (th[field === 'SP' ? getTargetField(th) : field] === target);
+        }, valvesSettled);
         return this.parseState(raw);
     }
 
@@ -126,28 +135,26 @@ export class NgbsIconServiceClient implements NgbsIconClient {
 
     async setEco(eco: boolean) {
         await this.setGlobalField('CE', Number(eco));
-        return this.parseState(await this.waitForState(20, 500, raw => raw.CE === Number(eco) && valvesSettled(raw)));
+        return this.parseState(await this.waitForState(20, 500, raw => raw.CE === Number(eco), valvesSettled));
     }
 
     async setThermostatEco(id: string, eco: boolean) {
         await this.setThemostatField(id, 'CE', Number(eco));
-        return this.parseState(await this.waitForState(20, 500, raw =>
-            raw.DP[id].CE === Number(eco) && valvesSettled(raw)
-        ));
+        return this.parseState(await this.waitForState(20, 500, raw => raw.DP[id].CE === Number(eco), valvesSettled));
     }
 
     async setCooling(cooling: boolean) {
         await this.setGlobalField('HC', Number(cooling))
         // Split waiting into two phases, so that the first part can fail early without waiting for the second.
         await this.waitForState(2, 1000, raw => raw.HC === Number(cooling));
-        const raw = await this.waitForState(20, 500, valvesSettled);
+        const raw = await this.waitForState(20, 500, undefined, valvesSettled);
         return this.parseState(raw);
     }
 
     async setThermostatCooling(id: string, cooling: boolean) {
         await this.setThemostatField(id, 'HC', Number(cooling));
         await this.waitForState(2, 1000, raw => raw.DP[id].HC === Number(cooling));
-        const raw = await this.waitForState(20, 500, valvesSettled);
+        const raw = await this.waitForState(20, 500, undefined, valvesSettled);
         return this.parseState(raw);
     }
 
@@ -234,12 +241,15 @@ function valvesSettled(state: any) {
         const target = th[getTargetField(th)];
         const t = th.TEMP;
         const cooling = (th.HC === 1);
+        const [iconId, thId] = id.split('.');
+        const relayCfg = state.CFG["ICON" + iconId].RELAY["R" + thId];
         // Due to hysteresis, there are cases when it's not clear whether the valve should be open.
         // Treating those cases as OK, and only assuming a pending status if it's certain.
+        // In the relay config, heating/cooling can be disabled - moving on if disabled.
         if (cooling) {
-            if (th.OUT ? (t < target - hysteresis) : (t > target)) return false;
+            if (relayCfg.COOL && (th.OUT ? (t < target - hysteresis) : (t > target))) return false;
         } else {
-            if (th.OUT ? (t > target + hysteresis) : (t < target)) return false;
+            if (relayCfg.HEAT && (th.OUT ? (t > target + hysteresis) : (t < target))) return false;
         }
     }
     return true;
