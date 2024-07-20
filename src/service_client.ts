@@ -65,6 +65,10 @@ export class NgbsIconServiceClient implements NgbsIconClient {
         return this.parseState(await this.request({ 'SYSID': this.sysId, 'RELOAD': config ? 3 : undefined }));
     }
 
+    async export(): Promise<string> {
+        return await this.request({ 'SYSID': this.sysId, 'RELOAD': 3 });
+    }
+
     // Wait for state to stabilize to avoid flickering. Exact timing and condition depends on the caller context.
     // Required condition must be met. If optional condition is met as well, return immediately - otherwise keep
     // retrying until the optional condition is met as well, or we reach the retry limit.

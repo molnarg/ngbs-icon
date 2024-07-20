@@ -65,7 +65,9 @@ async function run() {
             console.log(state!.thermostats);
         }
     } else if (device === 'controller') {
-        if (operation === 'get') {
+        if (operation === 'export') {
+            console.log(JSON.stringify(await c.export()));
+        } else if (operation === 'get') {
             state = await c.getState(true);
         } else if (operation === 'set') {
             if (command[2] === 'midpoints') {

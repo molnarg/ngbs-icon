@@ -34,6 +34,13 @@ $ ngbs_icon service://123456789@192.168.1.19 controller get
 {"eco":false,"cooling":false,"waterTemperature":222,"outsideTemperature":222,"midpoints":{"heating":23,"cooling":23,"ecoHeating":20,"ecoCooling":26},"firmwareVersion":1079,"configVersion":"20230110173134","timezone":"UTC","uptime":21,"config":{"name":"Test Controller","mixingValve":0,"thermostatHysteresis":0.5}}
 ```
 
+Export the whole config of the iCON controller (`client.export()`):
+
+```bash
+$ ngbs_icon service://123456789@192.168.1.19 controller export
+{"SYSID":"123456789","KEY":"123456789", ... }
+```
+
  Print the status of a specific thermostat or all without thermostat ID (`client.getState().thermostats`):
 
 ```bash

@@ -65,6 +65,9 @@ export interface NgbsIconState {
 export interface NgbsIconClient {
     getState(config?: boolean): Promise<NgbsIconState>;
 
+    // Export the whole config of the iCON controller as JSON.
+    export(): Promise<string>;
+
     // Set target temperature. Cooling and ECO specify the mode. It waits for state to stabilize (the target to be
     // applied and valves to be actuated) before returning it.
     setThermostatTarget(id: string, target: number, cooling?: boolean, eco?: boolean): Promise<NgbsIconState>;
