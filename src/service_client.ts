@@ -20,7 +20,7 @@ export class NgbsIconServiceClient implements NgbsIconClient {
             socket.once('error', (e) => {
                 socket.destroy();
                 reject(e);
-            });    
+            });
             socket.connect(this.port, this.host, () => {
                 socket.end(JSON.stringify(req));
                 let response = '';
@@ -44,7 +44,7 @@ export class NgbsIconServiceClient implements NgbsIconClient {
     async getSysId(): Promise<string> {
         let response;
         try {
-            response = await this.request({ 'RELOAD': 6 });            
+            response = await this.request({ 'RELOAD': 6 });
         } catch(e: any) {
             // Versions prior to 1079 (from Jan 2023) require you to provide the SYSID in
             // every request, including this.

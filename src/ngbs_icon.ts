@@ -131,7 +131,7 @@ const ipToNumber = (ip: string) => {
         .reduce((acc, cur) => acc | cur, 0) >>> 0;
     }
 }
-  
+
 export async function scanIpRange(start: string, end: string): Promise<{[host: string]: string}> {
     const startNumber = ipToNumber(start);
     const endNumber = ipToNumber(end);
