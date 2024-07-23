@@ -4,7 +4,7 @@ let command = process.argv.slice(2);
 if (command.length < 1) {
     throw new Error('Missing mandatory argument host')
 }
-const host = command.shift()!;
+let host = command.shift()!;
 
 async function run() {
     if (command[0] === 'sysid') {
@@ -23,6 +23,19 @@ async function run() {
         }
         console.log(results);
         return;
+    }
+
+    // If only IP address is specified without SYSID, look up SYSID first 
+    if (!host.startsWith('service://')) {
+        const sysId = await getSysId(host);
+        if (!sysId) {
+            console.log(
+                'Could not retrieve SYSID, due to the controller running an old software version. ' + 
+                'Please specify it manually using the following format: service://123456789@192.168.1.2'
+            );
+            return;
+        }
+        host = 'service://' + sysId + '@' + host
     }
 
     const c = connect(host);
