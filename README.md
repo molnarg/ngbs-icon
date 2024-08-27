@@ -44,7 +44,7 @@ $ ngbs_icon 192.168.1.19 controller export
 {"SYSID":"123456789","KEY":"123456789", ... }
 ```
 
- Print the status of a specific thermostat or all without thermostat ID (`client.getState().thermostats`):
+Print the status of a specific thermostat or all without thermostat ID (`client.getState().thermostats`):
 
 ```bash
 $ ngbs_icon 192.168.1.19 thermostat get 1.1
