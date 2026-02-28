@@ -7,12 +7,12 @@
     "ngbs_icon": "dist/ngbs_icon.js"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node --test --require tsx/cjs src/index.test.ts"
   },
-  "dependencies": {},
   "devDependencies": {
     "@tsconfig/node20": "^20.1.2",
     "@types/node": "^20.10.6",
+    "tsx": "^4.21.0",
     "typescript": "^5.3.3"
   },
   "repository": {
