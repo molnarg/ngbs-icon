@@ -2,6 +2,16 @@ import {NgbsIconClient, NgbsIconState} from './client'
 import {Socket} from 'net'
 import { setTimeout } from "timers/promises";
 
+// Some firmware versions emit bare leading-zero integers (e.g. 0000) which are
+// not valid JSON. They only appear as numeric object values — after the closing "
+// of a key and a colon. An unescaped " before : cannot occur inside a string
+// value (it would terminate it), so this substitution is safe.
+export function parseNgbsResponse(raw: string): any {
+    if (raw === '') return {};
+    const sanitized = raw.replace(/(?<!\\)"(\s*:\s*)0{2,}(?=[,}\]\s]|$)/gm, '"$10');
+    return JSON.parse(sanitized);
+}
+
 export class NgbsIconServiceClient implements NgbsIconClient {
     url: string;
 
@@ -28,7 +38,7 @@ export class NgbsIconServiceClient implements NgbsIconClient {
                 socket.once('end', () => {
                     socket.destroySoon();
                     try {
-                        const data = (response === '') ? {} : JSON.parse(response);
+                        const data = parseNgbsResponse(response);
                         if (data['ERR'] === 1) {
                             reject(new Error('NGBS error (incorrect SYSID?)'));
                         }
